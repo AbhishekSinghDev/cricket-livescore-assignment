@@ -48,4 +48,26 @@ const ButtonConfigurations = {
   ],
 };
 
-export { PlayerData, PlayerSelectDropdowns, ButtonConfigurations };
+// Batsman table data
+const BatsmanHeaders = ["Batsman", "R", "B", "4s"];
+const BatsmanData = [
+  ["Abhishek*", "63", "42", "-"],
+  ["Shiva", "8", "1", "-"],
+];
+
+// Bowlers table data
+const BowlersHeaders = ["Bowler", "0", "M", "R", "W"];
+const BowlersData = [
+  ["Sanjay*", "3.0", "0", "31", "1"],
+  ["Ayush", "8", "0", "20", "2"],
+];
+
+export {
+  PlayerData,
+  PlayerSelectDropdowns,
+  ButtonConfigurations,
+  BatsmanData,
+  BatsmanHeaders,
+  BowlersData,
+  BowlersHeaders,
+};
