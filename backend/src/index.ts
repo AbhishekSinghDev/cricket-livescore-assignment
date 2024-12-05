@@ -3,45 +3,41 @@ import http from "http";
 import express, { Request, Response } from "express";
 import { Server } from "socket.io";
 import cors from "cors";
-import SocketEvents from "../lib/socket-events";
+import Env, { verifyEnv } from "./lib/env";
+import connectDatabase from "./lib/connect-db";
+import { errorHandler } from "./utils";
+
+// routes
+import AuthRoutes from "./routes/auth";
+import UserRoutes from "./routes/user";
+import { universalApiRateLimiterMiddleware } from "./middleware";
+import { corsOptions } from "./constants";
+
+verifyEnv(); // this function checks all the env vars before starting any process makesure at runtime we are not getting any env var as undefined.
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
+  cors: corsOptions,
 });
 
-const PORT = process.env.PORT || 9090;
+app.use(universalApiRateLimiterMiddleware); // limits 1000 req per ip address for 15 min [prevent api spamming]
+app.use(express.json());
+app.use(cors(corsOptions));
 
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-    credentials: true,
-  })
-);
+// routes
+app.use("/api/v1/auth", AuthRoutes);
+app.use("/api/v1/user", UserRoutes);
+
+app.use(errorHandler);
+
+connectDatabase();
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello");
 });
 
-io.on(SocketEvents.connect, (socket) => {
-  console.log("user connected: ", socket.id);
-
-  socket.on(SocketEvents.message, (data) => {
-    console.log(data);
-    socket.broadcast.emit(SocketEvents.received_message, data);
-  });
-
-  socket.on(SocketEvents.disconnect, () => {
-    console.log(`user disconnected: ${socket.id}`);
-  });
-});
-
+const PORT = Env.PORT;
 server.listen(PORT, () => {
   console.log(`[server]: Server listening at PORT: ${PORT}`);
 });
