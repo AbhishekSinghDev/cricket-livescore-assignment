@@ -16,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
 import CommentryMessageCard from "./commenty-message-card";
 
@@ -24,7 +23,7 @@ const Length = 24;
 
 const ScoreBoard = () => {
   return (
-    <div className="border max-w-xl w-full p-4 rounded-lg border-gray-400 bg-gray-50 space-y-3">
+    <div className="border w-full lg:max-w-md p-4 rounded-lg border-gray-400 bg-gray-50 space-y-3">
       {/* title */}
       <p className="flex items-center gap-2 text-sm font-medium">
         <ChevronDown className="size-4" /> Scorecard

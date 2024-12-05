@@ -4,7 +4,7 @@ import ScoreBoard from "@/components/shared/score-board";
 
 const page = () => {
   return (
-    <div className="flex items-start gap-3 p-2">
+    <div className="flex flex-col lg:flex-row gap-3 p-1">
       <AdminControls />
       <ScoreBoard />
     </div>

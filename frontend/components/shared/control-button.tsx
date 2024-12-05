@@ -10,7 +10,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({ text, className }) => {
   return (
     <div
       className={cn(
-        "flex items-center justify-center rounded-md text-white font-semibold text-nowrap text-lg cursor-pointer",
+        "flex items-center justify-center rounded-md text-white font-semibold text-nowrap text-sm xl:text-lg cursor-pointer",
         className
       )}
     >
