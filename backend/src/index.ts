@@ -10,6 +10,8 @@ import { errorHandler } from "./utils";
 // routes
 import AuthRoutes from "./routes/auth";
 import UserRoutes from "./routes/user";
+import MatchRoutes from "./routes/match";
+
 import { universalApiRateLimiterMiddleware } from "./middleware";
 import { corsOptions } from "./constants";
 import seedDatabase from "./seed";
@@ -29,6 +31,7 @@ app.use(cors(corsOptions));
 // routes
 app.use("/api/v1/auth", AuthRoutes);
 app.use("/api/v1/user", UserRoutes);
+app.use("/api/v1/match", MatchRoutes);
 
 app.use(errorHandler);
 

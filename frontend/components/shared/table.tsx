@@ -1,9 +1,11 @@
 import { cn } from "@/lib/utils";
+import { TBatsman, TBowler, TPlayer } from "@/types";
 import React from "react";
 
 interface TableProps {
   headers: string[];
-  data: (string | number)[][];
+  batsman?: TBatsman[];
+  bowler?: TBowler;
   className?: string;
   headerClassName?: string;
   rowClassName?: string;
@@ -11,7 +13,8 @@ interface TableProps {
 
 const Table: React.FC<TableProps> = ({
   headers,
-  data,
+  batsman,
+  bowler,
   className = "",
   headerClassName = "",
   rowClassName = "",
@@ -39,21 +42,24 @@ const Table: React.FC<TableProps> = ({
         </tr>
       </thead>
       <tbody>
-        {data.map((row, rowIndex) => (
-          <tr key={rowIndex} className={rowClassName}>
-            {row.map((cell, cellIndex) => (
-              <td
-                key={cellIndex}
-                className={cn(
-                  "px-4 py-1",
-                  cellIndex === 0 ? "" : "text-center"
-                )}
-              >
-                {cell === "-" ? cell : cell}
-              </td>
-            ))}
+        {batsman &&
+          batsman.map((item, cellIndex) => (
+            <tr key={item._id} className={rowClassName}>
+              <td className="px-4 py-1 text-start">{item.name}</td>
+              <td className="px-4 py-1 text-center">{item.runs}</td>
+              <td className="px-4 py-1 text-center">{item.ballsFaced}</td>
+              <td className="px-4 py-1 text-center">{item.fours}</td>
+            </tr>
+          ))}
+
+        {bowler && (
+          <tr className={rowClassName}>
+            <td className="px-4 py-1 text-start">{bowler.name}</td>
+            <td className="px-4 py-1 text-center">{bowler.overs}</td>
+            <td className="px-4 py-1 text-center">{bowler.runsConceded}</td>
+            <td className="px-4 py-1 text-center">{bowler.wickets}</td>
           </tr>
-        ))}
+        )}
       </tbody>
     </table>
   );

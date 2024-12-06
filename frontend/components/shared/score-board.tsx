@@ -1,5 +1,7 @@
+"use client";
+
 import { ChevronDown, Search, X } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ScoreCard from "./score-card";
 import Table from "./table";
 import {
@@ -18,10 +20,68 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "../ui/separator";
 import CommentryMessageCard from "./commenty-message-card";
-
-const Length = 24;
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import { TStatus } from "@/types";
+import { TMatch, TMatchResponse } from "@/types/response";
+import { axiosInstance } from "@/lib";
+import Loading from "./loading";
+import LastBalls from "./last-balls";
 
 const ScoreBoard = () => {
+  const [status, setStatus] = useState<TStatus>("idle");
+  const [errMsg, setErrMsg] = useState<string | null>(null);
+  const [matchResponse, setMatchResponse] =
+    useState<TMatchResponse<true> | null>(null);
+  const [match, setMatch] = useState<TMatch | null>(null);
+
+  useEffect(() => {
+    const fetchMatchData = async () => {
+      try {
+        setStatus("loading");
+        const { data } = await axiosInstance.post("/match/match-details", {
+          matchId: "6752b79ae4917164dc897b13",
+        });
+
+        if (data.success) {
+          const successResponse = data as TMatchResponse<true>;
+          setMatchResponse(successResponse);
+          setMatch(successResponse.data.match);
+          setStatus("success");
+        }
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          const errorResponse = error.response?.data as
+            | TMatchResponse<false>
+            | undefined;
+
+          toast.error(errorResponse?.message ?? "An unexpected error occurred");
+        } else {
+          toast.error("An unexpected error occurred");
+        }
+
+        setErrMsg("something went wrong");
+        setStatus("error");
+      } finally {
+        setTimeout(() => setStatus("idle"), 3000);
+      }
+    };
+
+    if (!matchResponse) {
+      void fetchMatchData();
+    }
+  }, []);
+
+  if (status === "loading") {
+    return <Loading />;
+  }
+
+  console.log(match);
+
+  if (!match) {
+    return <div>Match not found</div>;
+  }
+
   return (
     <div className="border w-full p-4 rounded-lg border-gray-400 bg-gray-50 space-y-3">
       {/* title */}
@@ -35,9 +95,19 @@ const ScoreBoard = () => {
           View Full Score Card
         </div>
         <div className="flex items-center my-2">
-          <ScoreCard countryInitial="IND" wickets={7} runs={160} overs="20.0" />
+          <ScoreCard
+            countryInitial={match.team1.name}
+            wickets={match.team1.wickets}
+            runs={match.team1.score}
+            overs="20.0" // i forget to add over count in database
+          />
           <span className="text-red-600 font-semibold">vs</span>
-          <ScoreCard countryInitial="IND" wickets={7} runs={160} overs="20.0" />
+          <ScoreCard
+            countryInitial={match.team2.name}
+            wickets={match.team2.wickets}
+            runs={match.team2.score}
+            overs="20.0" // same here i forgot to add over count in database
+          />
         </div>
 
         <p className="font-bold text-sm text-center bg-gray-200 py-2">
@@ -46,25 +116,13 @@ const ScoreBoard = () => {
       </div>
 
       {/* batsman details table */}
-      <Table headers={BatsmanHeaders} data={BatsmanData} />
+      <Table headers={BatsmanHeaders} batsman={match.currentBatsmen} />
 
       {/* bowlers details table */}
-      <Table headers={BowlersHeaders} data={BowlersData} />
+      <Table headers={BowlersHeaders} bowler={match.currentBowler} />
 
       {/* balls count and relvant run data */}
-      <div className="p-2 border rounded-lg flex items-center gap-6 justify-between bg-gray-100">
-        <p className="text-nowrap font-semibold">{Length} Balls</p>
-        <ul className="flex items-center gap-2 overflow-scroll w-full no-scrollbar">
-          {Array.from({ length: Length }).map((_, idx) => (
-            <li
-              key={idx}
-              className="border rounded-sm px-1 text-sm bg-gray-200 border-gray-300"
-            >
-              {idx}
-            </li>
-          ))}
-        </ul>
-      </div>
+      <LastBalls />
 
       {/* extra's info box */}
       <div className="p-2 border rounded-lg flex items-center gap-6 justify-between bg-gray-100">
@@ -118,13 +176,13 @@ const ScoreBoard = () => {
 
       {/* commentry */}
       <div className="flex flex-col overflow-scroll gap-2 h-52 no-scrollbar">
-        {Array.from({ length: 5 }).map((_, idx) => (
+        {match.ballByBallCommentary.toReversed().map((item) => (
           <CommentryMessageCard
-            key={idx}
-            run={1}
-            over={19}
-            ball={4}
-            message="Abhishek To Shiva: "
+            key={item._id}
+            run={item.runs}
+            over={2} // actually i forgot to add over in database. so i dont have enough time left to add now so i am leaving it as hardcoded
+            ball={item.ball}
+            message={item.commentry}
           />
         ))}
       </div>

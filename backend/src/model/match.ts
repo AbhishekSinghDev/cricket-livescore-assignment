@@ -82,6 +82,7 @@ const MatchSchema = new mongoose.Schema({
   currentBowler: BowlerSchema,
   ballByBallCommentary: [
     {
+      runs: Number,
       ball: Number,
       commentry: String,
       timestamp: {
