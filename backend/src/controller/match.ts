@@ -203,4 +203,33 @@ const updateBallDetails = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export { getMatchDetails, getLastBallsDetails, updateBallDetails };
+const getAllMatchesId = async (req: Request, res: Response) => {
+  try {
+    const matches = await Match.find({});
+
+    let ids: string[] = [];
+    matches.map((item) => ids.push(item._id.toString()));
+
+    res.status(200).json({
+      success: true,
+      message: "machtes fetched successfully",
+      data: ids,
+    });
+
+    return;
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: "internal server error",
+    });
+    return;
+  }
+};
+
+export {
+  getAllMatchesId,
+  getMatchDetails,
+  getLastBallsDetails,
+  updateBallDetails,
+};

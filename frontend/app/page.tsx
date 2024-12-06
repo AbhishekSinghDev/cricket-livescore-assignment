@@ -1,8 +1,8 @@
-import ScoreBoard from "@/components/shared/score-board";
+import Matches from "@/components/shared/matches";
 import React from "react";
 
 const page = () => {
-  return <ScoreBoard />;
+  return <Matches />;
 };
 
 export default page;

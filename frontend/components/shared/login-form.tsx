@@ -72,7 +72,7 @@ const LoginForm = () => {
           );
           setStatus("success");
 
-          router.push("/admin");
+          router.push("/");
         }
       } else {
         const failedResponse = data as TLoginResponse<false>;

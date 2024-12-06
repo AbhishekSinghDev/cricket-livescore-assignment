@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDown, Search, X } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import ScoreCard from "./score-card";
 import Table from "./table";
 import {
@@ -261,4 +261,12 @@ const ScoreBoard = () => {
   );
 };
 
-export default ScoreBoard;
+const MainPage = () => {
+  return (
+    <Suspense>
+      <ScoreBoard />
+    </Suspense>
+  );
+};
+
+export default MainPage;
