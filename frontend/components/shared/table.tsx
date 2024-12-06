@@ -45,7 +45,9 @@ const Table: React.FC<TableProps> = ({
         {batsman &&
           batsman.map((item, cellIndex) => (
             <tr key={item._id} className={rowClassName}>
-              <td className="px-4 py-1 text-start">{item.name}</td>
+              <td className="px-4 py-1 text-start">
+                {item.name} {item.isOnStrike && "*"}{" "}
+              </td>
               <td className="px-4 py-1 text-center">{item.runs}</td>
               <td className="px-4 py-1 text-center">{item.ballsFaced}</td>
               <td className="px-4 py-1 text-center">{item.fours}</td>

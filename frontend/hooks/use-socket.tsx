@@ -4,12 +4,12 @@ import SocketEvents from "@/lib/socket-events";
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
-export const useSocket = (url: string) => {
+export const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
     // Create socket connection
-    const socketIo = io(url, {
+    const socketIo = io("http://localhost:8080", {
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
@@ -29,7 +29,7 @@ export const useSocket = (url: string) => {
     return () => {
       socketIo.disconnect();
     };
-  }, [url]);
+  }, []);
 
   return socket;
 };

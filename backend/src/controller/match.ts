@@ -3,6 +3,8 @@ import { AuthRequest } from "../types";
 import { BallDetailsValidationSchema } from "../validations/match";
 import Match from "../model/match";
 import BallDetails from "../model/ball-detail";
+import { io } from "../index";
+import SocketEvents from "../lib/socket-events";
 
 const getMatchDetails = async (req: Request, res: Response) => {
   const { matchId } = req.body;
@@ -63,11 +65,13 @@ const getLastBallsDetails = async (req: Request, res: Response) => {
       .limit(ballsCount)
       .sort({ _id: -1 });
 
+    io.emit(SocketEvents.lastballs_update, { balls: ballsData });
+
     res.status(200).json({
       success: true,
       message: "balls fetched successfully",
       data: {
-        balls: ballsData.reverse(),
+        balls: ballsData,
       },
     });
 
@@ -182,7 +186,7 @@ const updateBallDetails = async (req: AuthRequest, res: Response) => {
 
     await match.save();
 
-    // io.emit("matchUpdate", match)
+    io.emit("matchUpdate", match);
 
     res.json({
       success: true,

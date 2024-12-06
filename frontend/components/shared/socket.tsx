@@ -7,7 +7,7 @@ import { useSocket } from "@/hooks/use-socket";
 import SocketEvents from "@/lib/socket-events";
 
 const SocketComponent = () => {
-  const socket = useSocket("http://localhost:8080");
+  const socket = useSocket();
   const [msg, setMsg] = useState("");
   const [receivedMessages, setReceivedMessages] = useState<string[]>([]);
 

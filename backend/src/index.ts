@@ -14,13 +14,13 @@ import MatchRoutes from "./routes/match";
 
 import { universalApiRateLimiterMiddleware } from "./middleware";
 import { corsOptions } from "./constants";
-import seedDatabase from "./seed";
+import SocketEvents from "./lib/socket-events";
 
 verifyEnv(); // this function checks all the env vars before starting any process makesure at runtime we are not getting any env var as undefined.
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: corsOptions,
 });
 
@@ -39,6 +39,10 @@ connectDatabase();
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello");
+});
+
+io.on(SocketEvents.connect, (socket) => {
+  console.log("socket connected: ", socket.id);
 });
 
 const PORT = Env.PORT;

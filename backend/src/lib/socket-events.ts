@@ -5,6 +5,8 @@ const SocketEvents = {
   welcome: "welcome",
   message: "message",
   received_message: "received-message",
+  match_update: "matchUpdate",
+  lastballs_update: "lastballs_update",
 };
 
 export default SocketEvents;

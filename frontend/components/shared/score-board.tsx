@@ -22,25 +22,41 @@ import { Separator } from "../ui/separator";
 import CommentryMessageCard from "./commenty-message-card";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
-import { TStatus } from "@/types";
-import { TMatch, TMatchResponse } from "@/types/response";
+import { TBallDetail, TStatus } from "@/types";
+import {
+  TBallsDetailsResponse,
+  TMatch,
+  TMatchResponse,
+} from "@/types/response";
 import { axiosInstance } from "@/lib";
 import Loading from "./loading";
 import LastBalls from "./last-balls";
+import { useSocket } from "@/hooks/use-socket";
+import SocketEvents from "@/lib/socket-events";
+import { usePathname, useSearchParams } from "next/navigation";
 
 const ScoreBoard = () => {
+  const socket = useSocket();
+  const searchParams = useSearchParams();
+
   const [status, setStatus] = useState<TStatus>("idle");
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const [matchResponse, setMatchResponse] =
     useState<TMatchResponse<true> | null>(null);
   const [match, setMatch] = useState<TMatch | null>(null);
+  const [lastBallsDetails, setLastBallsDetails] = useState<
+    TBallDetail[] | null
+  >(null);
 
   useEffect(() => {
     const fetchMatchData = async () => {
+      const matchId = searchParams.get("matchId");
+      if (!matchId) return;
+
       try {
         setStatus("loading");
         const { data } = await axiosInstance.post("/match/match-details", {
-          matchId: "6752b79ae4917164dc897b13",
+          matchId: matchId,
         });
 
         if (data.success) {
@@ -72,14 +88,69 @@ const ScoreBoard = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const fetchBallDetails = async () => {
+      try {
+        const { data } = await axiosInstance.post("/match/last-balls", {
+          balls: 10,
+        });
+
+        if (data.success) {
+          const successResponse = data as TBallDetail[];
+          setLastBallsDetails(successResponse);
+          return;
+        } else {
+          setStatus("error");
+        }
+
+        toast.error(`failed to fetch last ${10} balls.`);
+      } catch (err) {
+        console.log(err);
+        setStatus("error");
+      } finally {
+        setStatus("idle");
+      }
+    };
+
+    void fetchBallDetails();
+  }, [socket, status]);
+
+  useEffect(() => {
+    const listenForSocketEvent = () => {
+      if (!socket) return;
+
+      socket.on(SocketEvents.match_update, (data: TMatch) => {
+        setMatch(data);
+        console.log("socket res: ", data);
+      });
+      socket.on(
+        SocketEvents.lastballs_update,
+        (data: { balls: TBallDetail[] }) => {
+          setLastBallsDetails(data.balls);
+        }
+      );
+
+      // Cleanup listeners
+      return () => {
+        socket.off(SocketEvents.match_update);
+        socket.off(SocketEvents.lastballs_update);
+      };
+    };
+
+    listenForSocketEvent();
+  }, [socket, status]);
+
   if (status === "loading") {
     return <Loading />;
   }
 
-  console.log(match);
-
   if (!match) {
-    return <div>Match not found</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Match not found, You need to provide matchId mannually in params. like
+        BASE_ADDRESS?matchId=12121
+      </div>
+    );
   }
 
   return (
@@ -122,7 +193,7 @@ const ScoreBoard = () => {
       <Table headers={BowlersHeaders} bowler={match.currentBowler} />
 
       {/* balls count and relvant run data */}
-      <LastBalls />
+      <LastBalls lastBalls={lastBallsDetails} />
 
       {/* extra's info box */}
       <div className="p-2 border rounded-lg flex items-center gap-6 justify-between bg-gray-100">
