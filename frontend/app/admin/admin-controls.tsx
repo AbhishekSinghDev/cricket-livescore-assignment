@@ -6,7 +6,7 @@ import ControlButtonGrid from "./control-button-grid";
 
 const AdminControls = () => {
   return (
-    <div className="flex flex-col gap-1 border rounded-lg border-gray-400 flex-1 p-4">
+    <div className="flex flex-col gap-1 border rounded-lg border-gray-400 lg:col-span-2 p-4">
       {/* Player Dropdowns */}
       <div className="flex gap-2 items-center justify-between flex-wrap">
         {PlayerSelectDropdowns.map((item, idx) => (
