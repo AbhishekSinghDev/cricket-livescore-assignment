@@ -12,6 +12,7 @@ import AuthRoutes from "./routes/auth";
 import UserRoutes from "./routes/user";
 import { universalApiRateLimiterMiddleware } from "./middleware";
 import { corsOptions } from "./constants";
+import seedDatabase from "./seed";
 
 verifyEnv(); // this function checks all the env vars before starting any process makesure at runtime we are not getting any env var as undefined.
 
