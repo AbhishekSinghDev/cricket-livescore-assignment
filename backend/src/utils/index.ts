@@ -19,7 +19,7 @@ export const comparePassword = async (
 };
 
 export const generateAccessToken = (userId: string, email: string): string => {
-  return jwt.sign({ userId, email }, ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+  return jwt.sign({ userId, email }, ACCESS_TOKEN_SECRET, { expiresIn: "7h" });
 };
 
 export const generateRefreshToken = (userId: string, email: string): string => {
